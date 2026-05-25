@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Angular build output
+/dist
+/.angular
+/out-tsc
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# IDEs and Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Environment secrets
+.env
+.env.local
+
+# Testing
+/coverage
+/e2e/dist

@@ -1,0 +1,30 @@
+<div class="admin-shell" [class.collapsed]="collapsed">
+  <aside class="sidebar">
+    <div class="brand-strip">
+      <img src="assets/images/indian-railways-logo.png" alt="Indian Railways" />
+      <div>
+        <strong>AI-RAG</strong>
+        <span>Chat-Agent</span>
+      </div>
+    </div>
+    <p-panelMenu [model]="menu" [multiple]="false"></p-panelMenu>
+  </aside>
+
+  <section class="workspace">
+    <header class="topbar">
+      <button pButton type="button" icon="pi pi-bars" class="p-button-text p-button-sm" (click)="collapsed = !collapsed"></button>
+      <div class="app-title">AI-RAG-Chat-Agent Admin Panel</div>
+      <div class="user-area">
+        <span>Welcome, {{ (auth.currentUser$ | async)?.name || 'Admin' }}</span>
+        <button pButton icon="pi pi-user" class="p-button-rounded p-button-sm" routerLink="/profile" pTooltip="Profile"></button>
+        <button pButton icon="pi pi-sign-out" class="p-button-danger p-button-sm" (click)="logout()" pTooltip="Logout"></button>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+
+    <footer>Powered by AI-RAG-Chat-Agent | Indian Railways Enterprise Portal</footer>
+  </section>
+</div>
