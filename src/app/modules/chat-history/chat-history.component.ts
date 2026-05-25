@@ -8,12 +8,12 @@ import { ChatService } from '../../core/services/chat.service';
     <app-page-header title="Chat History" subtitle="Review AI answers, sources, models, and relevance"></app-page-header>
 
     <section class="enterprise-card table-wrap">
-      <div class="toolbar">
+      <!-- <div class="toolbar">
         <input pInputText placeholder="Keyword search" [(ngModel)]="keyword" />
         <input pInputText placeholder="User filter" [(ngModel)]="user" />
         <p-calendar [(ngModel)]="date" dateFormat="dd-M-yy" placeholder="Date"></p-calendar>
         <button pButton icon="pi pi-filter" label="Apply" (click)="load()"></button>
-      </div>
+      </div> -->
 
       <p-table [value]="conversations" [paginator]="true" [rows]="20" [rowsPerPageOptions]="[10,20,50]" [scrollable]="true" scrollHeight="430px" styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
@@ -30,12 +30,12 @@ import { ChatService } from '../../core/services/chat.service';
         </ng-template>
         <ng-template pTemplate="body" let-row>
           <tr>
-            <td>{{ row.user || 'User' }}</td>
-            <td>{{ row.conversation_id }}</td>
+            <td>{{ row.user.name || '-' }}</td>
+            <td>{{ row.conversation_title }}</td>
             <td>{{ row.last_question }}</td>
             <td>{{ row.last_answer }}</td>
             <td><p-tag severity="info" [value]="row.model"></p-tag></td>
-            <td>{{ row.created_at | istDate }}</td>
+            <td>{{ row.startdate | istDate }}</td>
             <td>{{ (row.last_activity || row.created_at) | istDate }}</td>
             <td><button pButton icon="pi pi-eye" class="p-button-sm" label="View" (click)="open(row)"></button></td>
           </tr>
@@ -48,7 +48,7 @@ import { ChatService } from '../../core/services/chat.service';
         <ng-container *ngFor="let message of messages">
           <div class="bubble-row user">
             <div class="bubble">
-              <b>User</b>
+              
               <p>{{ message.question }}</p>
               <small>{{ message.created_at | istDate }}</small>
             </div>
@@ -142,14 +142,14 @@ export class ChatHistoryComponent implements OnInit {
   date?: Date;
   dialog = false;
 
-  constructor(private chat: ChatService, private cdr: ChangeDetectorRef) {}
+  constructor(private readonly chat: ChatService, private readonly cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.load();
   }
 
   load(): void {
-    this.chat.conversations({ limit: 50, search: this.keyword, user: this.user }).subscribe((rows) => {
+    this.chat.getChatHistory({ limit: 100 }).subscribe((rows) => {
       this.conversations = rows;
       this.cdr.markForCheck();
     });
@@ -163,3 +163,4 @@ export class ChatHistoryComponent implements OnInit {
     });
   }
 }
+ 

@@ -25,18 +25,25 @@ export interface AppUser {
 export interface ManagedFile {
   id: string;
   filename: string;
+  filepath: string;
   file_size: number;
   file_type: string;
+  is_active: boolean;
   is_embedded: boolean;
   created_at: string;
 }
 
 export interface ChatConversation {
   conversation_id: string;
-  user?: string;
+  user: {
+    id: string;
+    email: string;
+  };
+  conversation_title?: string;
   last_question: string;
   last_answer: string;
   model: string;
+  startdate: string;
   created_at: string;
   last_activity?: string;
 }

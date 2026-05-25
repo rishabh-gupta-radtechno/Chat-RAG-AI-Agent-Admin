@@ -11,14 +11,14 @@ export class FileService {
     return this.api.get<ManagedFile[]>('/files/list', query);
   }
 
-  upload(file: File): Observable<unknown> {
+  upload(file: File): Observable<ManagedFile> {
     const data = new FormData();
     data.append('file', file);
-    return this.api.post('/files/upload', data);
+    return this.api.post<ManagedFile>('/files/upload', data);
   }
 
   generateEmbedding(fileId: string): Observable<unknown> {
-    return this.api.post(`/files/generate-embedding/${fileId}`, {});
+    return this.api.post(`/files/sync-embeddings/${fileId}`, {});
   }
 
   delete(fileId: string): Observable<unknown> {
