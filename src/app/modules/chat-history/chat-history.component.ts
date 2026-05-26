@@ -8,12 +8,28 @@ import { ChatService } from '../../core/services/chat.service';
     <app-page-header title="Chat History" subtitle="Review AI answers, sources, models, and relevance"></app-page-header>
 
     <section class="enterprise-card table-wrap">
-      <!-- <div class="toolbar">
-        <input pInputText placeholder="Keyword search" [(ngModel)]="keyword" />
-        <input pInputText placeholder="User filter" [(ngModel)]="user" />
-        <p-calendar [(ngModel)]="date" dateFormat="dd-M-yy" placeholder="Date"></p-calendar>
+      <div class="toolbar">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            placeholder="Search conversation"
+            [(ngModel)]="search"
+            (keyup.enter)="load()"
+          />
+        </span>
+        <p-calendar
+          [(ngModel)]="fromDate"
+          dateFormat="dd-M-yy"
+          placeholder="From date"
+        ></p-calendar>
+        <p-calendar
+          [(ngModel)]="toDate"
+          dateFormat="dd-M-yy"
+          placeholder="To date"
+        ></p-calendar>
         <button pButton icon="pi pi-filter" label="Apply" (click)="load()"></button>
-      </div> -->
+      </div>
 
       <p-table [value]="conversations" [paginator]="true" [rows]="20" [rowsPerPageOptions]="[10,20,50]" [scrollable]="true" scrollHeight="430px" styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
@@ -77,7 +93,7 @@ import { ChatService } from '../../core/services/chat.service';
       .toolbar {
         display: grid;
         gap: 10px;
-        grid-template-columns: minmax(220px, 1fr) 180px 170px auto;
+        grid-template-columns: 1fr 160px 160px auto;
         margin-bottom: 10px;
       }
       .chat-window {
@@ -137,9 +153,9 @@ import { ChatService } from '../../core/services/chat.service';
 export class ChatHistoryComponent implements OnInit {
   conversations: ChatConversation[] = [];
   messages: ChatMessage[] = [];
-  keyword = '';
-  user = '';
-  date?: Date;
+  search = '';
+  fromDate?: Date;
+  toDate?: Date;
   dialog = false;
 
   constructor(private readonly chat: ChatService, private readonly cdr: ChangeDetectorRef) { }

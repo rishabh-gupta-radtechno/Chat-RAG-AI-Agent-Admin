@@ -24,16 +24,24 @@ import { FileService } from "../../core/services/file.service";
     </app-page-header>
     <section class="enterprise-card table-wrap">
       <div class="toolbar">
-        <input pInputText placeholder="Search file name" [(ngModel)]="search" />
-        <p-dropdown
-          [options]="types"
-          [(ngModel)]="fileType"
-          placeholder="File type"
-        ></p-dropdown>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            placeholder="Search file name"
+            [(ngModel)]="search"
+            (keyup.enter)="load()"
+          />
+        </span>
         <p-calendar
           [(ngModel)]="fromDate"
           dateFormat="dd-M-yy"
           placeholder="From date"
+        ></p-calendar>
+        <p-calendar
+          [(ngModel)]="toDate"
+          dateFormat="dd-M-yy"
+          placeholder="To date"
         ></p-calendar>
         <button
           pButton
@@ -117,7 +125,7 @@ import { FileService } from "../../core/services/file.service";
       .toolbar {
         display: grid;
         gap: 10px;
-        grid-template-columns: minmax(220px, 1fr) 160px 170px auto;
+        grid-template-columns: 1fr 160px 160px auto;
         margin-bottom: 10px;
       }
       .actions {
@@ -131,12 +139,8 @@ import { FileService } from "../../core/services/file.service";
 export class FilesComponent implements OnInit {
   files: ManagedFile[] = [];
   search = "";
-  fileType = "";
   fromDate?: Date;
-  types = [
-    { label: "PDF", value: "application/pdf" },
-    { label: "All", value: "" },
-  ];
+  toDate?: Date;
 
   constructor(
     private filesApi: FileService,
@@ -155,7 +159,6 @@ export class FilesComponent implements OnInit {
         skip: 0,
         limit: 100,
         search: this.search,
-        file_type: this.fileType,
       })
       .subscribe((files) => {
         this.files = files;

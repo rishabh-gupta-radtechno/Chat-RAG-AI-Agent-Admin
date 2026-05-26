@@ -34,10 +34,20 @@ import { UserService } from "../../core/services/user.service";
             (keyup.enter)="load()"
           />
         </span>
+        <p-calendar
+          [(ngModel)]="fromDate"
+          dateFormat="dd-M-yy"
+          placeholder="From date"
+        ></p-calendar>
+        <p-calendar
+          [(ngModel)]="toDate"
+          dateFormat="dd-M-yy"
+          placeholder="To date"
+        ></p-calendar>
         <button
           pButton
           icon="pi pi-refresh"
-          label="Refresh"
+          label="Apply"
           (click)="load()"
         ></button>
       </div>
@@ -134,9 +144,9 @@ import { UserService } from "../../core/services/user.service";
         padding: 14px;
       }
       .toolbar {
-        display: flex;
+        display: grid;
         gap: 10px;
-        justify-content: space-between;
+        grid-template-columns: 1fr 160px 160px auto;
         margin-bottom: 10px;
       }
       .actions {
@@ -150,6 +160,8 @@ import { UserService } from "../../core/services/user.service";
 export class UsersComponent implements OnInit {
   users: AppUser[] = [];
   search = "";
+  fromDate?: Date;
+  toDate?: Date;
   passwordDialog = false;
   selectedUser?: AppUser;
   newPassword = "";
