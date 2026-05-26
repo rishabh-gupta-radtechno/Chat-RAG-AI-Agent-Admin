@@ -19,6 +19,10 @@ export class ApiService {
     return this.http.post<T>(`${this.baseUrl}${url}`, body).pipe(retry(1));
   }
 
+  put<T>(url: string, body: unknown): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}${url}`, body).pipe(retry(1));
+  }
+
   patch<T>(url: string, body: unknown): Observable<T> {
     return this.http.patch<T>(`${this.baseUrl}${url}`, body).pipe(retry(1));
   }

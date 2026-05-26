@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 @Component({
   selector: 'app-dashboard',
   template: `
-    <app-page-header title="Dashboard" subtitle="Operational overview for AI-RAG-Chat-Agent"></app-page-header>
+    <app-page-header title="Dashboard" subtitle="Operational overview for ABS-Chat-Agent"></app-page-header>
     <section class="stats">
       <p-card *ngFor="let card of cards" styleClass="metric-card">
         <div class="metric">
@@ -15,13 +15,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         </div>
       </p-card>
     </section>
-    <p-panel header="System Readiness" styleClass="enterprise-card">
-      <div class="readiness">
-        <div><b>API Base URL</b><span>http://148.230.67.63:8000</span></div>
-        <div><b>Document Pipeline</b><p-tag severity="success" value="Configured"></p-tag></div>
-        <div><b>Authentication</b><p-tag severity="info" value="JWT Enabled"></p-tag></div>
-      </div>
-    </p-panel>
   `,
   styles: [
     `
