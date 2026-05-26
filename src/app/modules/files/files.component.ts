@@ -154,16 +154,36 @@ export class FilesComponent implements OnInit {
   }
 
   load(): void {
+    const params: any = {
+      skip: 0,
+      limit: 100,
+    };
+
+    if (this.search) {
+      params.filename = this.search;
+    }
+
+    if (this.fromDate) {
+      params.start_date = this.formatDate(this.fromDate);
+    }
+
+    if (this.toDate) {
+      params.end_date = this.formatDate(this.toDate);
+    }
+
     this.filesApi
-      .list({
-        skip: 0,
-        limit: 100,
-        search: this.search,
-      })
+      .list(params)
       .subscribe((files) => {
         this.files = files;
         this.cdr.markForCheck();
       });
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   embed(file: ManagedFile): void {

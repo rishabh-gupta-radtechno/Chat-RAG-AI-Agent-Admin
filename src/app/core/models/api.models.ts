@@ -20,6 +20,8 @@ export interface AppUser {
   email: string;
   is_active: boolean;
   created_at: string;
+  mobile?: number;
+  department?: string;
 }
 
 export interface ManagedFile {
