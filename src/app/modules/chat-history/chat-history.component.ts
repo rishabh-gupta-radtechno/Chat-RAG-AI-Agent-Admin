@@ -75,7 +75,9 @@ import { ChatService } from '../../core/services/chat.service';
               <p>{{ message.answer }}</p>
               <div class="sources" *ngIf="message.sources?.length">
                 <span *ngFor="let source of message.sources">
-                  {{ source.filename }} · Chunk {{ source.chunk_index }} · Score {{ source.relevance_score | number: '1.2-2' }}
+                  {{ source.filename }} · <span class="page-number">
+      Page {{ source.page_number }}
+    </span>
                 </span>
               </div>
             </div>
@@ -132,6 +134,14 @@ import { ChatService } from '../../core/services/chat.service';
         flex-wrap: wrap;
         gap: 6px;
       }
+      .page-number {
+        font-weight: 700;
+        background: #fff3cd;
+        color: #856404;
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid #ffe69c;
+      }
       .sources span {
         background: #dceeff;
         border: 1px solid #9ec2e8;
@@ -179,4 +189,3 @@ export class ChatHistoryComponent implements OnInit {
     });
   }
 }
- 

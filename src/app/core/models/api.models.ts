@@ -52,6 +52,7 @@ export interface ChatSource {
   filename: string;
   file_id: string;
   chunk_index: number;
+  page_number: number;
   relevance_score: number;
 }
 
