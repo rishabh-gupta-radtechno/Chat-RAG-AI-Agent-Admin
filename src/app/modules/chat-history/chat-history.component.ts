@@ -13,7 +13,7 @@ import { ChatService } from '../../core/services/chat.service';
           <i class="pi pi-search"></i>
           <input
             pInputText
-            placeholder="Search conversation"
+            placeholder="Search by user"
             [(ngModel)]="search"
             (keyup.enter)="load()"
           />
@@ -175,10 +175,33 @@ export class ChatHistoryComponent implements OnInit {
   }
 
   load(): void {
-    this.chat.getChatHistory({ limit: 100 }).subscribe((rows) => {
+    const params: any = {
+      limit: 100,
+    };
+
+    if (this.search) {
+      params.user_name = this.search;
+    }
+
+    if (this.fromDate) {
+      params.start_date = this.formatDate(this.fromDate);
+    }
+
+    if (this.toDate) {
+      params.end_date = this.formatDate(this.toDate);
+    }
+
+    this.chat.getChatHistory(params).subscribe((rows) => {
       this.conversations = rows;
       this.cdr.markForCheck();
     });
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   open(row: ChatConversation): void {
