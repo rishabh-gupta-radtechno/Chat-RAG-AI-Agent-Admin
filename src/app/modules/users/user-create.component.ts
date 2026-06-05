@@ -38,6 +38,22 @@ import { UserService } from "../../core/services/user.service";
         </div>
         <div class="field">
           <label
+            ><app-required-label label="Mobile Number"></app-required-label
+          ></label>
+          <input pInputText formControlName="mobile" />
+          <small class="helper-text"> Mobile number must be 10 digits. </small>
+        </div>
+        <div class="field">
+          <label
+            ><app-required-label
+              label="Department"
+              [required]="false"
+            ></app-required-label
+          ></label>
+          <input pInputText formControlName="department" />
+        </div>
+        <div class="field">
+          <label
             ><app-required-label label="Password"></app-required-label
           ></label>
           <p-password
@@ -57,7 +73,11 @@ import { UserService } from "../../core/services/user.service";
             formControlName="confirmPassword"
             [toggleMask]="true"
             [feedback]="false"
+            (onBlur)="validatePasswordMatch()"
           ></p-password>
+          <small class="p-error" *ngIf="showPasswordMismatchError">
+            Passwords should be the same
+          </small>
         </div>
         <div class="field">
           <label>Enable/Disable</label>
@@ -90,10 +110,11 @@ import { UserService } from "../../core/services/user.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserCreateComponent {
+  showPasswordMismatchError = false;
+  
   form = this.fb.nonNullable.group(
     {
       name: [""],
-      // email: ["", [Validators.required, Validators.email]],
       email: [
         "",
         [
@@ -105,6 +126,8 @@ export class UserCreateComponent {
       ],
       password: ["", [Validators.required, Validators.minLength(8)]],
       confirmPassword: ["", [Validators.required, Validators.minLength(8)]],
+      department: [""],
+      mobile: ["", [Validators.required, Validators.pattern(/^\d{10}$/)]],
       enabled: [true],
     },
     { validators: this.passwordMatchValidator },
@@ -128,6 +151,17 @@ export class UserCreateComponent {
     }
 
     return password === confirmPassword ? null : { passwordMismatch: true };
+  }
+
+  validatePasswordMatch(): void {
+    const password = this.form.get("password")?.value;
+    const confirmPassword = this.form.get("confirmPassword")?.value;
+
+    if (confirmPassword && password !== confirmPassword) {
+      this.showPasswordMismatchError = true;
+    } else {
+      this.showPasswordMismatchError = false;
+    }
   }
 
   submit(): void {
@@ -167,6 +201,24 @@ export class UserCreateComponent {
       return;
     }
 
+    if (this.form.get("mobile")?.hasError("required")) {
+      this.messages.add({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "Mobile number is required",
+      });
+      return;
+    }
+
+    if (this.form.get("mobile")?.hasError("pattern")) {
+      this.messages.add({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "Mobile number must be exactly 10 digits",
+      });
+      return;
+    }
+
     if (this.form.hasError("passwordMismatch")) {
       this.messages.add({
         severity: "error",
@@ -180,7 +232,14 @@ export class UserCreateComponent {
     const value = this.form.getRawValue();
 
     this.users
-      .register(value.name, value.email, value.password, value.enabled)
+      .register(
+        value.name,
+        value.email,
+        value.password,
+        value.enabled,
+        value.department,
+        parseInt(value.mobile),
+      )
       .subscribe({
         next: () => {
           this.messages.add({

@@ -11,8 +11,8 @@ export class UserService {
     return this.api.get<AppUser[]>('/auth/getalluser', query);
   }
 
-  register(name: string, email: string, password: string, enabled: boolean): Observable<AppUser> {
-    return this.api.post<AppUser>('/auth/register', { name, email, password, is_enabled: enabled });
+  register(name: string, email: string, password: string, enabled: boolean, department?: string, mobile?: number): Observable<AppUser> {
+    return this.api.post<AppUser>('/auth/register', { name, email, password, is_enabled: enabled, department, mobile });
   }
 
   changePassword(userId: string, password: string): Observable<unknown> {
@@ -21,6 +21,10 @@ export class UserService {
 
   setStatus(userId: string, isActive: boolean): Observable<AppUser> {
     return this.api.put<AppUser>(`/auth/updateUser/${userId}`, { is_active: isActive });
+  }
+
+  updateUser(userId: string, data: Partial<AppUser>): Observable<AppUser> {
+    return this.api.put<AppUser>(`/auth/updateUser/${userId}`, data);
   }
 
   deleteUser(userId: string): Observable<{ message: string; id: string }> {

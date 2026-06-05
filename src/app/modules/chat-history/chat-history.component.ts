@@ -13,7 +13,7 @@ import { ChatService } from '../../core/services/chat.service';
           <i class="pi pi-search"></i>
           <input
             pInputText
-            placeholder="Search conversation"
+            placeholder="Search by user"
             [(ngModel)]="search"
             (keyup.enter)="load()"
           />
@@ -75,7 +75,9 @@ import { ChatService } from '../../core/services/chat.service';
               <p>{{ message.answer }}</p>
               <div class="sources" *ngIf="message.sources?.length">
                 <span *ngFor="let source of message.sources">
-                  {{ source.filename }} · Chunk {{ source.chunk_index }} · Score {{ source.relevance_score | number: '1.2-2' }}
+                  {{ source.filename }} · <span class="page-number">
+      Page {{ source.page_number }}
+    </span>
                 </span>
               </div>
             </div>
@@ -132,6 +134,14 @@ import { ChatService } from '../../core/services/chat.service';
         flex-wrap: wrap;
         gap: 6px;
       }
+      .page-number {
+        font-weight: 700;
+        background: #fff3cd;
+        color: #856404;
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid #ffe69c;
+      }
       .sources span {
         background: #dceeff;
         border: 1px solid #9ec2e8;
@@ -165,10 +175,33 @@ export class ChatHistoryComponent implements OnInit {
   }
 
   load(): void {
-    this.chat.getChatHistory({ limit: 100 }).subscribe((rows) => {
+    const params: any = {
+      limit: 100,
+    };
+
+    if (this.search) {
+      params.user_name = this.search;
+    }
+
+    if (this.fromDate) {
+      params.start_date = this.formatDate(this.fromDate);
+    }
+
+    if (this.toDate) {
+      params.end_date = this.formatDate(this.toDate);
+    }
+
+    this.chat.getChatHistory(params).subscribe((rows) => {
       this.conversations = rows;
       this.cdr.markForCheck();
     });
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   open(row: ChatConversation): void {
@@ -179,4 +212,3 @@ export class ChatHistoryComponent implements OnInit {
     });
   }
 }
- 

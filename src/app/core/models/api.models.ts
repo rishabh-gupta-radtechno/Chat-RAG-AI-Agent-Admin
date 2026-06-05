@@ -20,6 +20,8 @@ export interface AppUser {
   email: string;
   is_active: boolean;
   created_at: string;
+  mobile?: number;
+  department?: string;
 }
 
 export interface ManagedFile {
@@ -52,6 +54,7 @@ export interface ChatSource {
   filename: string;
   file_id: string;
   chunk_index: number;
+  page_number: number;
   relevance_score: number;
 }
 
