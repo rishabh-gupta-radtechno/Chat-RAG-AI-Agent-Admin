@@ -54,6 +54,15 @@ import { UserService } from "../../core/services/user.service";
         </div>
         <div class="field">
           <label
+            ><app-required-label
+              label="Designation"
+              [required]="false"
+            ></app-required-label
+          ></label>
+          <input pInputText formControlName="designation" />
+        </div>
+        <div class="field">
+          <label
             ><app-required-label label="Password"></app-required-label
           ></label>
           <p-password
@@ -127,6 +136,7 @@ export class UserCreateComponent {
       password: ["", [Validators.required, Validators.minLength(8)]],
       confirmPassword: ["", [Validators.required, Validators.minLength(8)]],
       department: [""],
+      designation: [""],
       mobile: ["", [Validators.required, Validators.pattern(/^\d{10}$/)]],
       enabled: [true],
     },
@@ -238,6 +248,7 @@ export class UserCreateComponent {
         value.password,
         value.enabled,
         value.department,
+        value.designation,
         parseInt(value.mobile),
       )
       .subscribe({

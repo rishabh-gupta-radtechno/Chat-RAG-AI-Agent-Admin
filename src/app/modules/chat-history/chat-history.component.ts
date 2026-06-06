@@ -1,11 +1,20 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ChatConversation, ChatMessage } from '../../core/models/api.models';
-import { ChatService } from '../../core/services/chat.service';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from "@angular/core";
+import { ChatConversation, ChatMessage } from "../../core/models/api.models";
+import { ChatService } from "../../core/services/chat.service";
+import { environment } from "../../../environments/environment";
 
 @Component({
-  selector: 'app-chat-history',
+  selector: "app-chat-history",
   template: `
-    <app-page-header title="Chat History" subtitle="Review AI answers, sources, models, and relevance"></app-page-header>
+    <app-page-header
+      title="Chat History"
+      subtitle="Review AI answers, sources, models, and relevance"
+    ></app-page-header>
 
     <section class="enterprise-card table-wrap">
       <div class="toolbar">
@@ -28,10 +37,23 @@ import { ChatService } from '../../core/services/chat.service';
           dateFormat="dd-M-yy"
           placeholder="To date"
         ></p-calendar>
-        <button pButton icon="pi pi-filter" label="Apply" (click)="load()"></button>
+        <button
+          pButton
+          icon="pi pi-filter"
+          label="Apply"
+          (click)="load()"
+        ></button>
       </div>
 
-      <p-table [value]="conversations" [paginator]="true" [rows]="20" [rowsPerPageOptions]="[10,20,50]" [scrollable]="true" scrollHeight="430px" styleClass="p-datatable-sm">
+      <p-table
+        [value]="conversations"
+        [paginator]="true"
+        [rows]="20"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        [scrollable]="true"
+        scrollHeight="430px"
+        styleClass="p-datatable-sm"
+      >
         <ng-template pTemplate="header">
           <tr>
             <th>User</th>
@@ -39,32 +61,47 @@ import { ChatService } from '../../core/services/chat.service';
             <th>Last Question</th>
             <th>Last Answer</th>
             <th>Model</th>
-            <th pSortableColumn="created_at">Start Date <p-sortIcon field="created_at"></p-sortIcon></th>
+            <th pSortableColumn="created_at">
+              Start Date <p-sortIcon field="created_at"></p-sortIcon>
+            </th>
             <th>Last Activity</th>
             <th>Operations</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-row>
           <tr>
-            <td>{{ row.user.name || '-' }}</td>
+            <td>{{ row.user.name || "-" }}</td>
             <td>{{ row.conversation_title }}</td>
             <td>{{ row.last_question }}</td>
             <td>{{ row.last_answer }}</td>
             <td><p-tag severity="info" [value]="row.model"></p-tag></td>
             <td>{{ row.startdate | istDate }}</td>
-            <td>{{ (row.last_activity || row.created_at) | istDate }}</td>
-            <td><button pButton icon="pi pi-eye" class="p-button-sm" label="View" (click)="open(row)"></button></td>
+            <td>{{ row.last_activity || row.created_at | istDate }}</td>
+            <td>
+              <button
+                pButton
+                icon="pi pi-eye"
+                class="p-button-sm"
+                label="View"
+                (click)="open(row)"
+              ></button>
+            </td>
           </tr>
         </ng-template>
       </p-table>
     </section>
 
-    <p-dialog [(visible)]="dialog" [modal]="true" [style]="{ width: '78vw' }" [breakpoints]="{ '900px': '95vw' }" header="Conversation Detail">
+    <p-dialog
+      [(visible)]="dialog"
+      [modal]="true"
+      [style]="{ width: '78vw' }"
+      [breakpoints]="{ '900px': '95vw' }"
+      header="Conversation Detail"
+    >
       <div class="chat-window" *ngIf="messages.length; else empty">
         <ng-container *ngFor="let message of messages">
           <div class="bubble-row user">
             <div class="bubble">
-              
               <p>{{ message.question }}</p>
               <small>{{ message.created_at | istDate }}</small>
             </div>
@@ -73,18 +110,54 @@ import { ChatService } from '../../core/services/chat.service';
             <div class="bubble">
               <b>AI/System · {{ message.model }}</b>
               <p>{{ message.answer }}</p>
+              <h4 class="source-title">Sources</h4>
               <div class="sources" *ngIf="message.sources?.length">
-                <span *ngFor="let source of message.sources">
-                  {{ source.filename }} · <span class="page-number">
-      Page {{ source.page_number }}
-    </span>
-                </span>
+                <button
+                  *ngFor="let source of message.sources"
+                  pButton
+                  type="button"
+                  class="p-button-sm p-button-outlined pdf-btn"
+                  [label]="source.filename + ' - Page ' + source.page_number"
+                  (click)="openPdf(source.filepath , source.page_number)"
+                  pTooltip="Click to open PDF"
+                ></button>
+              </div>
+              <div class="diagrams-section" *ngIf="message.diagrams?.length">
+                <h4>Diagrams</h4>
+                <div class="diagrams">
+                  <button
+                    *ngFor="let diagram of message.diagrams"
+                    pButton
+                    type="button"
+                    class="p-button-sm p-button-outlined diagram-btn"
+                    [label]="
+                      diagram.filename + ' - Page ' + diagram.page_number
+                    "
+                    (click)="viewDiagram(diagram.image_url)"
+                    pTooltip="Click to view diagram"
+                  ></button>
+                </div>
               </div>
             </div>
           </div>
         </ng-container>
       </div>
       <ng-template #empty>No messages found.</ng-template>
+    </p-dialog>
+
+    <p-dialog
+      [(visible)]="diagramDialog"
+      [modal]="true"
+      [style]="{ width: '85vw', height: '85vh' }"
+      [breakpoints]="{ '900px': '95vw' }"
+      header="Diagram Viewer"
+      [closable]="true"
+    >
+      <img
+        [src]="selectedDiagramUrl"
+        alt="Diagram"
+        style="width: 100%; height: 100%; object-fit: contain;"
+      />
     </p-dialog>
   `,
   styles: [
@@ -132,21 +205,55 @@ import { ChatService } from '../../core/services/chat.service';
       .sources {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px;
+        gap: 8px;
+        margin-top: 10px;
       }
-      .page-number {
-        font-weight: 700;
-        background: #fff3cd;
-        color: #856404;
-        padding: 2px 6px;
-        border-radius: 4px;
-        border: 1px solid #ffe69c;
+      .sources :deep(.p-button) {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        border: 2px solid #0b3d91 !important;
+        color: #0b3d91 !important;
+        background: #e7f1f9 !important;
+        border-radius: 4px !important;
       }
-      .sources span {
-        background: #dceeff;
-        border: 1px solid #9ec2e8;
-        color: #062b63;
-        padding: 3px 6px;
+      .sources :deep(.p-button:hover) {
+        background: #cfe4f1 !important;
+        border-color: #062b63 !important;
+      }
+      .pdf-btn {
+        border-radius: 20px !important;
+      }
+      .diagrams-section {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #e0e0e0;
+      }
+      .diagrams-section h4 {
+        margin: 0 0 10px 0;
+        font-size: 13px;
+        color: #333;
+        font-weight: 600;
+      }
+      .source-title {
+        margin: 0 0 10px 0;
+        font-size: 13px;
+        color: #333;
+        font-weight: 600;
+      }
+      .diagrams {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .diagram-btn {
+        background: #f0f7ff !important;
+        border: 2px solid #4a90e2 !important;
+        color: #4a90e2 !important;
+        border-radius: 20px !important;
+      }
+      .diagram-btn:hover {
+        background: #e6f0ff !important;
+        border-color: #2563eb !important;
       }
       @media (max-width: 900px) {
         .toolbar {
@@ -156,19 +263,24 @@ import { ChatService } from '../../core/services/chat.service';
           max-width: 92%;
         }
       }
-    `
+    `,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatHistoryComponent implements OnInit {
   conversations: ChatConversation[] = [];
   messages: ChatMessage[] = [];
-  search = '';
+  search = "";
   fromDate?: Date;
   toDate?: Date;
   dialog = false;
+  diagramDialog = false;
+  selectedDiagramUrl = "";
 
-  constructor(private readonly chat: ChatService, private readonly cdr: ChangeDetectorRef) { }
+  constructor(
+    private readonly chat: ChatService,
+    private readonly cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -199,8 +311,8 @@ export class ChatHistoryComponent implements OnInit {
 
   private formatDate(date: Date): string {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
 
@@ -210,5 +322,18 @@ export class ChatHistoryComponent implements OnInit {
       this.messages = messages;
       this.cdr.markForCheck();
     });
+  }
+
+  openPdf(filepath: string , pageNumber: number): void {
+    let  pdfUrl = `${environment.apiBaseUrl}/${filepath}`;
+    if (pageNumber) {
+      pdfUrl += `#page=${pageNumber}`;
+    }
+    window.open(pdfUrl, "_blank");
+  }
+
+  viewDiagram(imageUrl: string): void {
+    const diagramUrl = `${environment.apiBaseUrl}${imageUrl}`;
+    window.open(diagramUrl, "_blank");
   }
 }

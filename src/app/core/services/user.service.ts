@@ -11,8 +11,8 @@ export class UserService {
     return this.api.get<AppUser[]>('/auth/getalluser', query);
   }
 
-  register(name: string, email: string, password: string, enabled: boolean, department?: string, mobile?: number): Observable<AppUser> {
-    return this.api.post<AppUser>('/auth/register', { name, email, password, is_enabled: enabled, department, mobile });
+  register(name: string, email: string, password: string, enabled: boolean, department?: string, designation?: string, mobile?: number): Observable<AppUser> {
+    return this.api.post<AppUser>('/auth/register', { name, email, password, is_enabled: enabled, department, designation, mobile });
   }
 
   changePassword(userId: string, password: string): Observable<unknown> {

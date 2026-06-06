@@ -78,6 +78,9 @@ import { UserService } from "../../core/services/user.service";
             <th pSortableColumn="department">
               Department <p-sortIcon field="department"></p-sortIcon>
             </th>
+            <th pSortableColumn="designation">
+              Designation <p-sortIcon field="designation"></p-sortIcon>
+            </th>
             <th>Status</th>
             <th>Operations</th>
           </tr>
@@ -89,6 +92,7 @@ import { UserService } from "../../core/services/user.service";
             <td>{{ user.created_at | istDate }}</td>
             <td>{{ user.mobile || "-" }}</td>
             <td>{{ user.department || "-" }}</td>
+            <td>{{ user.designation || "-" }}</td>
             <td>
               <p-tag
                 [severity]="user.is_active ? 'success' : 'danger'"
@@ -164,6 +168,10 @@ import { UserService } from "../../core/services/user.service";
       <div class="field">
         <label><app-required-label label="Department" [required]="false"></app-required-label></label>
         <input pInputText [(ngModel)]="editUser.department" />
+      </div>
+      <div class="field">
+        <label><app-required-label label="Designation" [required]="false"></app-required-label></label>
+        <input pInputText [(ngModel)]="editUser.designation" />
       </div>
       <div class="field">
         <label><app-required-label label="Mobile Number"></app-required-label></label>
@@ -315,6 +323,7 @@ export class UsersComponent implements OnInit {
       name: this.editUser.name,
       email: this.editUser.email,
       department: this.editUser.department,
+      designation: this.editUser.designation,
       mobile: this.editUser.mobile ? parseInt(String(this.editUser.mobile)) : undefined,
     }).subscribe({
       next: () => {
