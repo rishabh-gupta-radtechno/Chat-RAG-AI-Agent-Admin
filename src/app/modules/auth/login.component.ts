@@ -12,7 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="brand">
           <img src="assets/images/indian-railways-logo.png" alt="Indian Railways" />
           <div>
-            <h1>ABS-Chat-Agent</h1>
+            <h1>ABS Chat Agent</h1>
             <span>Indian Railways Admin Portal</span>
           </div>
         </div>

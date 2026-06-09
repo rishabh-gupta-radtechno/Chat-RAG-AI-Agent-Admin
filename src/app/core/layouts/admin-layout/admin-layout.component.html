@@ -4,7 +4,7 @@
       <img src="assets/images/indian-railways-logo.png" alt="Indian Railways" />
       <div>
         <strong>ABS</strong>
-        <span>Chat-Agent</span>
+        <span>Chat Agent</span>
       </div>
     </div>
     <p-panelMenu [model]="menu" [multiple]="false"></p-panelMenu>
@@ -13,7 +13,7 @@
   <section class="workspace">
     <header class="topbar">
       <button pButton type="button" icon="pi pi-bars" class="p-button-text p-button-sm" (click)="collapsed = !collapsed"></button>
-      <div class="app-title">ABS-Chat-Agent Admin Panel</div>
+      <div class="app-title">ABS Chat Agent Admin Panel</div>
       <div class="user-area">
         <span>Welcome, {{ (auth.currentUser$ | async)?.name || 'Admin' }}</span>
         <button pButton icon="pi pi-user" class="p-button-rounded p-button-sm" routerLink="/profile" pTooltip="Profile"></button>
@@ -25,6 +25,6 @@
       <router-outlet></router-outlet>
     </main>
 
-    <footer>Powered by ABS-Chat-Agent | Indian Railways Enterprise Portal</footer>
+    <footer>Powered by ABS Chat Agent | Indian Railways Enterprise Portal</footer>
   </section>
 </div>

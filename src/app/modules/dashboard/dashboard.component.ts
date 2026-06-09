@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 @Component({
   selector: 'app-dashboard',
   template: `
-    <app-page-header title="Dashboard" subtitle="Operational overview for ABS-Chat-Agent"></app-page-header>
+    <app-page-header title="Dashboard" subtitle="Operational overview for ABS Chat Agent"></app-page-header>
     <section class="stats">
       <p-card *ngFor="let card of cards" styleClass="metric-card">
         <div class="metric">

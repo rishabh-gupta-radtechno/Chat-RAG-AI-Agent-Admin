@@ -44,65 +44,80 @@ import { environment } from "../../../environments/environment";
           (click)="load()"
         ></button>
       </div>
-
-      <p-table
-        [value]="conversations"
-        [paginator]="true"
-        [rows]="20"
-        [rowsPerPageOptions]="[10, 20, 50]"
-        sortField="last_activity"
-        [sortOrder]="-1"
-        [scrollable]="true"
-        scrollHeight="520px"
-        styleClass="p-datatable-sm"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th [ngStyle]="{'min-width': '100px', 'max-width': '150px'}">User</th>
-            <th [ngStyle]="{'min-width': '200px', 'max-width': '300px'}">Conversation Title</th>
-            <th [ngStyle]="{'min-width': '250px', 'max-width': '350px'}">Last Question</th>
-            <th [ngStyle]="{'min-width': '400px', 'max-width': '500px'}">Last Answer</th>
-           <th [ngStyle]="{'min-width': '150px', 'max-width': '200px'}" pSortableColumn="startdate">
-              Start Date <p-sortIcon field="startdate"></p-sortIcon>
-            </th>
-            <th [ngStyle]="{'min-width': '150px', 'max-width': '200px'}" pSortableColumn="last_activity">
-              Last Activity <p-sortIcon field="last_activity"></p-sortIcon>
-            </th>
-            <th [ngStyle]="{'min-width': '120px', 'max-width': '150px'}">Operations</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-row>
-          <tr>
-            <td>{{ row.user.name || "-" }}</td>
-            <td>
-              {{ (row.conversation_title?.length > titleQuestionLimit) 
-                 ? (row.conversation_title | slice:0:titleQuestionLimit) + '...' 
-                 : row.conversation_title }}
-            </td>
-            <td>
-              {{ (row.last_question?.length > titleQuestionLimit) 
-                 ? (row.last_question | slice:0:titleQuestionLimit) + '...' 
-                 : row.last_question }}
-            </td>
-            <td>
-              {{ (row.last_answer?.length > answerLimit) 
-                 ? (row.last_answer | slice:0:answerLimit) + '...' 
-                 : row.last_answer }}
-            </td>
-            <td>{{ row.startdate | istDate }}</td>
-            <td>{{ row.last_activity | istDate }}</td>
-            <td>
-              <button
-                pButton
-                icon="pi pi-eye"
-                class="p-button-sm"
-                label="View"
-                (click)="open(row)"
-              ></button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <div class="table-container">
+        <p-table
+          [value]="conversations"
+          [paginator]="true"
+          [rows]="20"
+          [rowsPerPageOptions]="[10, 20, 50]"
+          sortField="last_activity"
+          [sortOrder]="-1"
+          [scrollable]="true"
+          scrollHeight="520px"
+          styleClass="p-datatable-sm"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>User</th>
+              <th [ngStyle]="{ 'min-width': '150px', 'max-width': '200px' }">Conversation Title</th>
+              <th [ngStyle]="{ 'min-width': '150px', 'max-width': '200px' }">Last Question</th>
+              <th >Last Answer</th>
+              <th
+              [ngStyle]="{ 'min-width': '150px', 'max-width': '200px' }"
+                pSortableColumn="startdate"
+              >
+                Start Date <p-sortIcon field="startdate"></p-sortIcon>
+              </th>
+              <th
+                [ngStyle]="{ 'min-width': '150px', 'max-width': '200px' }"
+                pSortableColumn="last_activity"
+              >
+                Last Activity <p-sortIcon field="last_activity"></p-sortIcon>
+              </th>
+              <th>Operations</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.user.name || "-" }}</td>
+              <td>
+                {{
+                  row.conversation_title?.length > titleQuestionLimit
+                    ? (row.conversation_title | slice: 0 : titleQuestionLimit) +
+                      "..."
+                    : row.conversation_title
+                }}
+              </td>
+              <td>
+                {{
+                  row.last_question?.length > titleQuestionLimit
+                    ? (row.last_question | slice: 0 : titleQuestionLimit) +
+                      "..."
+                    : row.last_question
+                }}
+              </td>
+              <td>
+                {{
+                  row.last_answer?.length > answerLimit
+                    ? (row.last_answer | slice: 0 : answerLimit) + "..."
+                    : row.last_answer
+                }}
+              </td>
+              <td>{{ row.startdate | istDate }}</td>
+              <td>{{ row.last_activity | istDate }}</td>
+              <td>
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  class="p-button-sm"
+                  label="View"
+                  (click)="open(row)"
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
     </section>
 
     <p-dialog
@@ -132,7 +147,7 @@ import { environment } from "../../../environments/environment";
                   type="button"
                   class="p-button-sm p-button-outlined pdf-btn"
                   [label]="source.filename + ' - Page ' + source.page_number"
-                  (click)="openPdf(source.filepath , source.page_number)"
+                  (click)="openPdf(source.filepath, source.page_number)"
                   pTooltip="Click to open PDF"
                 ></button>
               </div>
@@ -176,8 +191,13 @@ import { environment } from "../../../environments/environment";
   `,
   styles: [
     `
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+      }
       .table-wrap {
         padding: 14px;
+        overflow: hidden;
       }
       .toolbar {
         display: grid;
@@ -343,8 +363,8 @@ export class ChatHistoryComponent implements OnInit {
     });
   }
 
-  openPdf(filepath: string , pageNumber: number): void {
-    let  pdfUrl = `${environment.apiBaseUrl}/${filepath}`;
+  openPdf(filepath: string, pageNumber: number): void {
+    let pdfUrl = `${environment.apiBaseUrl}/${filepath}`;
     if (pageNumber) {
       pdfUrl += `#page=${pageNumber}`;
     }
