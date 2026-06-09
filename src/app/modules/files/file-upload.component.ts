@@ -21,11 +21,11 @@ import { ManagedFile } from "../../core/models/api.models";
       ></button>
     </app-page-header>
     <section class="enterprise-card upload-wrap">
-      <p class="rule">* Allowed file types: PDF Maximum upload size: 100 MB</p>
+      <p class="rule">* Allowed file types: PDF Maximum upload size: 300 MB</p>
       <p-fileUpload
         name="file"
         accept=".pdf,application/pdf"
-        [maxFileSize]="104857600"
+        [maxFileSize]="314572800"
         [customUpload]="true"
         [multiple]="false"
         [disabled]="isUploading"
@@ -57,7 +57,7 @@ export class FileUploadComponent {
     // ".docx":
     //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   };
-  private readonly MAX_FILE_SIZE = 104857600; // 100 MB
+  private readonly MAX_FILE_SIZE = 314572800; // 300 MB
 
   constructor(
     private files: FileService,
@@ -97,7 +97,7 @@ export class FileUploadComponent {
       this.messages.add({
         severity: "error",
         summary: "File Too Large",
-        detail: "Maximum file size is 100 MB.",
+        detail: "Maximum file size is 300 MB.",
       });
       return;
     }
@@ -127,7 +127,7 @@ export class FileUploadComponent {
     let errorMessage = "An error occurred during upload.";
 
     if (error.status === 413) {
-      errorMessage = "File size exceeds maximum allowed (100 MB).";
+      errorMessage = "File size exceeds maximum allowed (300 MB).";
     } else if (error.status === 400) {
       errorMessage = error.error?.detail || "Invalid file type or format.";
     } else if (error.status === 401 || error.status === 403) {

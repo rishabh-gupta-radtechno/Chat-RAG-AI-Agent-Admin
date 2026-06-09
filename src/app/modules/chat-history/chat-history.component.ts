@@ -50,33 +50,47 @@ import { environment } from "../../../environments/environment";
         [paginator]="true"
         [rows]="20"
         [rowsPerPageOptions]="[10, 20, 50]"
+        sortField="last_activity"
+        [sortOrder]="-1"
         [scrollable]="true"
-        scrollHeight="430px"
+        scrollHeight="520px"
         styleClass="p-datatable-sm"
       >
         <ng-template pTemplate="header">
           <tr>
-            <th>User</th>
-            <th>Conversation Title</th>
-            <th>Last Question</th>
-            <th>Last Answer</th>
-            <th>Model</th>
-            <th pSortableColumn="created_at">
-              Start Date <p-sortIcon field="created_at"></p-sortIcon>
+            <th [ngStyle]="{'min-width': '100px', 'max-width': '150px'}">User</th>
+            <th [ngStyle]="{'min-width': '200px', 'max-width': '300px'}">Conversation Title</th>
+            <th [ngStyle]="{'min-width': '250px', 'max-width': '350px'}">Last Question</th>
+            <th [ngStyle]="{'min-width': '400px', 'max-width': '500px'}">Last Answer</th>
+           <th [ngStyle]="{'min-width': '150px', 'max-width': '200px'}" pSortableColumn="startdate">
+              Start Date <p-sortIcon field="startdate"></p-sortIcon>
             </th>
-            <th>Last Activity</th>
-            <th>Operations</th>
+            <th [ngStyle]="{'min-width': '150px', 'max-width': '200px'}" pSortableColumn="last_activity">
+              Last Activity <p-sortIcon field="last_activity"></p-sortIcon>
+            </th>
+            <th [ngStyle]="{'min-width': '120px', 'max-width': '150px'}">Operations</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-row>
           <tr>
             <td>{{ row.user.name || "-" }}</td>
-            <td>{{ row.conversation_title }}</td>
-            <td>{{ row.last_question }}</td>
-            <td>{{ row.last_answer }}</td>
-            <td><p-tag severity="info" [value]="row.model"></p-tag></td>
+            <td>
+              {{ (row.conversation_title?.length > titleQuestionLimit) 
+                 ? (row.conversation_title | slice:0:titleQuestionLimit) + '...' 
+                 : row.conversation_title }}
+            </td>
+            <td>
+              {{ (row.last_question?.length > titleQuestionLimit) 
+                 ? (row.last_question | slice:0:titleQuestionLimit) + '...' 
+                 : row.last_question }}
+            </td>
+            <td>
+              {{ (row.last_answer?.length > answerLimit) 
+                 ? (row.last_answer | slice:0:answerLimit) + '...' 
+                 : row.last_answer }}
+            </td>
             <td>{{ row.startdate | istDate }}</td>
-            <td>{{ row.last_activity || row.created_at | istDate }}</td>
+            <td>{{ row.last_activity | istDate }}</td>
             <td>
               <button
                 pButton
@@ -271,6 +285,8 @@ export class ChatHistoryComponent implements OnInit {
   conversations: ChatConversation[] = [];
   messages: ChatMessage[] = [];
   search = "";
+  titleQuestionLimit = 50;
+  answerLimit = 200;
   fromDate?: Date;
   toDate?: Date;
   dialog = false;
@@ -304,7 +320,10 @@ export class ChatHistoryComponent implements OnInit {
     }
 
     this.chat.getChatHistory(params).subscribe((rows) => {
-      this.conversations = rows;
+      this.conversations = rows.map((c) => ({
+        ...c,
+        last_activity: c.last_activity || c.created_at,
+      }));
       this.cdr.markForCheck();
     });
   }
