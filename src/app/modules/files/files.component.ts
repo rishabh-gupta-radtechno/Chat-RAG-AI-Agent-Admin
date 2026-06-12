@@ -187,6 +187,14 @@ export class FilesComponent implements OnInit {
   }
 
   embed(file: ManagedFile): void {
+    if (file.is_embedded) {
+      this.messages.add({
+        severity: "warn",
+        summary: "Already Embedded",
+        detail: `${file.filename} is already embedded.`,
+      });
+      return;
+    }
     this.filesApi.generateEmbedding(file.id).subscribe(() => {
       this.messages.add({
         severity: "success",
