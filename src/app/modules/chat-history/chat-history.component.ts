@@ -148,7 +148,6 @@ import { environment } from "../../../environments/environment";
                   class="p-button-sm p-button-outlined pdf-btn"
                   [label]="source.filename + ' - Page ' + source.page_number"
                   (click)="openPdf(source.filepath, source.page_number)"
-                  pTooltip="Click to open PDF"
                 ></button>
               </div>
               <div class="diagrams-section" *ngIf="message.diagrams?.length">
@@ -163,7 +162,6 @@ import { environment } from "../../../environments/environment";
                       diagram.filename + ' - Page ' + diagram.page_number
                     "
                     (click)="viewDiagram(diagram.image_url)"
-                    pTooltip="Click to view diagram"
                   ></button>
                 </div>
               </div>
