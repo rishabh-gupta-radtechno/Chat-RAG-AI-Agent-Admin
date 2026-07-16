@@ -120,18 +120,13 @@ import { UserService } from "../../core/services/user.service";
 })
 export class UserCreateComponent {
   showPasswordMismatchError = false;
-  
+
   form = this.fb.nonNullable.group(
     {
       name: [""],
       email: [
         "",
-        [
-          Validators.required,
-          Validators.pattern(
-            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/,
-          ),
-        ],
+        [Validators.required, Validators.pattern(/^[^\s@]+@[^\s@]+\.com$/)],
       ],
       password: ["", [Validators.required, Validators.minLength(8)]],
       confirmPassword: ["", [Validators.required, Validators.minLength(8)]],
@@ -240,7 +235,7 @@ export class UserCreateComponent {
     }
 
     const value = this.form.getRawValue();
-
+    console.log("Form Value:", value);
     this.users
       .register(
         value.name,

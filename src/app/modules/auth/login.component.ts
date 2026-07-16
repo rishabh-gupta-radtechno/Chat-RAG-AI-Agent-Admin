@@ -91,14 +91,14 @@ export class LoginComponent {
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-       console.log("not worked");
       return;
     }
-    console.log("worked");
-    // this.router.navigateByUrl('/dashboard');
-    this.auth.login(this.form.getRawValue()).subscribe(() => {
-      this.messages.add({ severity: 'success', summary: 'Login successful', detail: 'Welcome to admin portal.' });
-      this.router.navigateByUrl('/dashboard');
+
+    this.auth.login(this.form.getRawValue()).subscribe({
+      next: () => {
+        this.messages.add({ severity: 'success', summary: 'Login successful', detail: 'Welcome to admin portal.' });
+        this.router.navigateByUrl('/dashboard');
+      }
     });
   }
 }

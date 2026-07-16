@@ -4,6 +4,7 @@ import {
   Component,
   OnInit,
 } from "@angular/core";
+import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { ChatConversation, ChatMessage } from "../../core/models/api.models";
 import { ChatService } from "../../core/services/chat.service";
 import { environment } from "../../../environments/environment";
@@ -138,7 +139,7 @@ import { environment } from "../../../environments/environment";
           <div class="bubble-row ai">
             <div class="bubble">
               <b>AI/System · {{ message.model }}</b>
-              <p>{{ message.answer }}</p>
+              <div class="answer-content" [innerHTML]="renderAnswer(message.answer)"></div>
               <h4 class="source-title">Sources</h4>
               <div class="sources" *ngIf="message.sources?.length">
                 <button
@@ -234,6 +235,37 @@ import { environment } from "../../../environments/environment";
         margin: 7px 0;
         white-space: pre-wrap;
       }
+      .answer-content {
+        display: grid;
+        gap: 8px;
+      }
+      .answer-paragraph {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+      .answer-table-wrap {
+        margin-top: 6px;
+        overflow-x: auto;
+      }
+      .answer-table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 13px;
+        border: 1px solid #b7cce5;
+      }
+      .answer-table th,
+      .answer-table td {
+        border: 1px solid #b7cce5;
+        padding: 7px 9px;
+        text-align: left;
+      }
+      .answer-table th {
+        background: #eef5fc;
+        font-weight: 700;
+      }
+      .answer-table tr:nth-child(even) td {
+        background: #fafcff;
+      }
       .sources {
         display: flex;
         flex-wrap: wrap;
@@ -314,6 +346,7 @@ export class ChatHistoryComponent implements OnInit {
   constructor(
     private readonly chat: ChatService,
     private readonly cdr: ChangeDetectorRef,
+    private readonly sanitizer: DomSanitizer,
   ) {}
 
   ngOnInit(): void {
@@ -372,5 +405,82 @@ export class ChatHistoryComponent implements OnInit {
   viewDiagram(imageUrl: string): void {
     const diagramUrl = `${environment.apiBaseUrl}${imageUrl}`;
     window.open(diagramUrl, "_blank");
+  }
+
+  renderAnswer(answer: string): SafeHtml {
+    if (!answer) {
+      return this.sanitizer.bypassSecurityTrustHtml("");
+    }
+
+    const lines = answer.replace(/\r\n/g, "\n").split("\n");
+    const chunks: string[] = [];
+    let tableLines: string[] = [];
+    let inTable = false;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("|")) {
+        inTable = true;
+        tableLines.push(trimmed);
+        continue;
+      }
+
+      if (inTable) {
+        if (tableLines.length) {
+          chunks.push(this.renderMarkdownTable(tableLines));
+        }
+        tableLines = [];
+        inTable = false;
+      }
+
+      chunks.push(this.renderTextLine(line));
+    }
+
+    if (tableLines.length) {
+      chunks.push(this.renderMarkdownTable(tableLines));
+    }
+
+    return this.sanitizer.bypassSecurityTrustHtml(chunks.join(""));
+  }
+
+  private renderTextLine(line: string): string {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      return '<p class="answer-paragraph">&nbsp;</p>';
+    }
+
+    const escaped = this.escapeHtml(trimmed);
+    const withBold = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    return `<p class="answer-paragraph">${withBold}</p>`;
+  }
+
+  private renderMarkdownTable(lines: string[]): string {
+    const rows = lines
+      .filter((line) => line.trim())
+      .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+
+    if (rows.length < 2) {
+      return "";
+    }
+
+    const header = rows[0];
+    const bodyRows = rows.slice(2);
+
+    const headerHtml = `<tr>${header
+      .map((cell) => `<th style="border:1px solid #b7cce5;padding:7px 9px;background:#eef5fc;font-weight:700;">${this.escapeHtml(cell)}</th>`)
+      .join("")}</tr>`;
+    const bodyHtml = bodyRows
+      .map((row) => `<tr>${row.map((cell) => `<td style="border:1px solid #b7cce5;padding:7px 9px;">${this.escapeHtml(cell)}</td>`).join("")}</tr>`)
+      .join("");
+
+    return `<div style="margin-top:6px;overflow-x:auto;"><table style="border-collapse:collapse;width:100%;font-size:13px;border:1px solid #b7cce5;">${headerHtml}${bodyHtml}</table></div>`;
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;");
   }
 }

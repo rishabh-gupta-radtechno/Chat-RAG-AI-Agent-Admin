@@ -11,13 +11,19 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
+        const isLoginRequest = req.url.includes('/admin/login') || req.url.includes('/login');
+
+        if (error.status === 401 && !isLoginRequest) {
           this.auth.logout();
           this.messages.add({ severity: 'warn', summary: 'Session expired', detail: 'Please login again.' });
+        } else if (error.status === 401) {
+          const detail = error.error?.detail || error.error?.message || 'Invalid email or password.';
+          this.messages.add({ severity: 'error', summary: 'Login failed', detail });
         } else {
           const detail = error.error?.detail || error.error?.message || 'Request could not be completed.';
           this.messages.add({ severity: 'error', summary: 'API Error', detail });
         }
+
         return throwError(() => error);
       })
     );
