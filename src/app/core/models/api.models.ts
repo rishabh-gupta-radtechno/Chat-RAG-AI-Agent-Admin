@@ -33,6 +33,7 @@ export interface ManagedFile {
   file_type: string;
   is_active: boolean;
   is_embedded: boolean;
+  file_status?: boolean;
   created_at: string;
 }
 

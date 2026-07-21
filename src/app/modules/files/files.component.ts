@@ -72,6 +72,7 @@ import { FileService } from "../../core/services/file.service";
             </th>
             <th>File Type</th>
             <th>Embedding Status</th>
+            <th>File Status</th>
             <th>Operations</th>
           </tr>
         </ng-template>
@@ -95,7 +96,23 @@ import { FileService } from "../../core/services/file.service";
                 [value]="file.is_embedded ? 'Embedded' : 'Pending'"
               ></p-tag>
             </td>
+            <td>
+              <p-tag
+                [severity]="getFileStatus(file) ? 'success' : 'danger'"
+                [value]="getFileStatus(file) ? 'Active' : 'Disabled'"
+              ></p-tag>
+            </td>
             <td class="actions">
+              <button
+                pButton
+                [icon]="getFileStatus(file) ? 'pi pi-ban' : 'pi pi-check'"
+                class="p-button-sm"
+                [class.p-button-danger]="getFileStatus(file)"
+                [class.p-button-success]="!getFileStatus(file)"
+                pTooltip="Enable/Disable file"
+                (click)="toggleStatus(file)"
+              ></button>
+
               <button
                 pButton
                 icon="pi pi-cog"
@@ -186,6 +203,10 @@ export class FilesComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
+  getFileStatus(file: ManagedFile): boolean {
+    return file.file_status ?? file.is_active;
+  }
+
   embed(file: ManagedFile): void {
     if (file.is_embedded) {
       this.messages.add({
@@ -207,6 +228,26 @@ export class FilesComponent implements OnInit {
 
   apiFileUrl(file: ManagedFile): string {
     return `/files/${file.id}`;
+  }
+
+  toggleStatus(file: ManagedFile): void {
+    const isActive = this.getFileStatus(file);
+
+    this.confirmation.confirm({
+      message: `Do you want to ${isActive ? "disable" : "enable"} ${file.filename}?`,
+      accept: () => {
+        this.filesApi.setStatus(file.id, !isActive).subscribe({
+          next: () => {
+            this.messages.add({
+              severity: "success",
+              summary: "Status updated",
+              detail: file.filename,
+            });
+            this.load();
+          },
+        });
+      },
+    });
   }
 
   remove(file: ManagedFile): void {
