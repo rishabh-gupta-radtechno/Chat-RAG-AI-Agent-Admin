@@ -51,6 +51,7 @@ import { environment } from "../../../environments/environment";
           [paginator]="true"
           [rows]="20"
           [rowsPerPageOptions]="[10, 20, 50]"
+          [paginatorDropdownAppendTo]="'body'"
           sortField="last_activity"
           [sortOrder]="-1"
           [scrollable]="true"
