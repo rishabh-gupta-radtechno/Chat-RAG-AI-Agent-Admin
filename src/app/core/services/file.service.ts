@@ -21,6 +21,10 @@ export class FileService {
     return this.api.post(`/files/sync-embeddings/${fileId}`, {});
   }
 
+  setStatus(fileId: string, isActive: boolean): Observable<ManagedFile> {
+    return this.api.post<ManagedFile>(`/files/${fileId}/status`, { is_active: isActive });
+  }
+
   delete(fileId: string): Observable<unknown> {
     return this.api.delete(`/files/${fileId}`);
   }

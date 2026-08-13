@@ -12,23 +12,27 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   get<T>(url: string, query?: Record<string, QueryValue>): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}${url}`, { params: this.toParams(query) }).pipe(retry(1));
+    return this.withRetry(this.http.get<T>(`${this.baseUrl}${url}`, { params: this.toParams(query) }), url);
   }
 
   post<T>(url: string, body: unknown): Observable<T> {
-    return this.http.post<T>(`${this.baseUrl}${url}`, body).pipe(retry(1));
+    return this.withRetry(this.http.post<T>(`${this.baseUrl}${url}`, body), url);
   }
 
   put<T>(url: string, body: unknown): Observable<T> {
-    return this.http.put<T>(`${this.baseUrl}${url}`, body).pipe(retry(1));
+    return this.withRetry(this.http.put<T>(`${this.baseUrl}${url}`, body), url);
   }
 
   patch<T>(url: string, body: unknown): Observable<T> {
-    return this.http.patch<T>(`${this.baseUrl}${url}`, body).pipe(retry(1));
+    return this.withRetry(this.http.patch<T>(`${this.baseUrl}${url}`, body), url);
   }
 
   delete<T>(url: string): Observable<T> {
-    return this.http.delete<T>(`${this.baseUrl}${url}`).pipe(retry(1));
+    return this.withRetry(this.http.delete<T>(`${this.baseUrl}${url}`), url);
+  }
+
+  private withRetry<T>(request: Observable<T>, url: string): Observable<T> {
+    return url.includes('/admin/login') || url.includes('/login') ? request : request.pipe(retry(1));
   }
 
   private toParams(query?: Record<string, QueryValue>): HttpParams {
